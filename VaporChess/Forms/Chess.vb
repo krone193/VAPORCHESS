@@ -1,4 +1,6 @@
-﻿Public Class Chess
+﻿Imports System.ComponentModel
+
+Public Class Chess
 	'--- V A P O R C H E S S | Namespace declarations ----------------------------------------------------------------------'
 	'-----------------------------------------------------------------------------------------------------------------------'
 	ReadOnly ChessFunc As New VaporChessFunc
@@ -6,9 +8,27 @@
 
 	'--- V A P O R C H E S S | Declarations --------------------------------------------------------------------------------'
 	'-----------------------------------------------------------------------------------------------------------------------'
+	ReadOnly SavedGamePath As String = "last.dream"
 	ReadOnly Board(ChessBoard.CL.columns, ChessBoard.RW.rows) As Panel
 	ReadOnly Pieces As New PiecesList
 
+
+	'--- V A P O R C H E S S | Variables -----------------------------------------------------------------------------------'
+	'-----------------------------------------------------------------------------------------------------------------------'
+	Public Structure UserSettings
+		Dim MyName As String
+		Dim ThyName As String
+	End Structure
+	Public Settings As UserSettings
+
+	Sub ArgumentStringCleaner(ByRef toclean As String)
+		If toclean.First() = ControlChars.Quote Then
+			toclean = toclean.Substring(1)
+		End If
+		If toclean.Last() = ControlChars.Quote Then
+			toclean = toclean.Substring(0, toclean.Length - 1)
+		End If
+	End Sub
 
 	'--- V A P O R C H E S S | GUI functions -------------------------------------------------------------------------------'
 	'-----------------------------------------------------------------------------------------------------------------------'
@@ -27,6 +47,36 @@
 		ChessFunc.BoardColumnsReferenceH(h1, h2, h3, h4, h5, h6, h7, h8)
 		ChessFunc.CreateBoard(Board)
 		ChessFunc.PlacePieces(Board, Pieces)
+		If IO.File.Exists(SavedGamePath) Then
+			' Load previous game
+		Else
+			Settings.MyName = "it's a me"
+			Settings.ThyName = "a boi"
+			' Start a new game with passed parameters
+			If My.Application.CommandLineArgs.Count > 0 Then
+				If My.Application.CommandLineArgs.ElementAt(0) <> "" Then
+					Settings.MyName = My.Application.CommandLineArgs.ElementAt(0)
+					ArgumentStringCleaner(Settings.MyName)
+					If My.Application.CommandLineArgs.Count > 1 Then
+						If My.Application.CommandLineArgs.ElementAt(1) <> "" Then
+							Settings.ThyName = My.Application.CommandLineArgs.ElementAt(1)
+							ArgumentStringCleaner(Settings.ThyName)
+						End If
+					End If
+				End If
+			End If
+		End If
+	End Sub
+	'-----------------------------------------------------------------------------------------------------------------------'
+	Private Sub Chess_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+		Dim result As DialogResult = MessageBox.Show("Do you want to save the game?", "V A P O R C H E S S - Warning message", MessageBoxButtons.YesNoCancel)
+		If result = DialogResult.Cancel Then
+			e.Cancel = True
+		ElseIf result = DialogResult.No Then
+
+		ElseIf result = DialogResult.Yes Then
+			'SaveSettings()
+		End If
 	End Sub
 	'-----------------------------------------------------------------------------------------------------------------------'
 	Private Sub Chess_MouseClick(sender As Object, e As MouseEventArgs) Handles a1.MouseClick, a2.MouseClick, a3.MouseClick, a4.MouseClick, a5.MouseClick, a6.MouseClick, a7.MouseClick, a8.MouseClick,

@@ -349,9 +349,12 @@
 
 	'--- V A P O R C H E S S F U N C | Private GUI management functions ----------------------------------------------------'
 	'-----------------------------------------------------------------------------------------------------------------------'
-	Private Sub ShowMoveSet(ByRef moveset As List(Of Panel), ByRef movesetcolor As List(Of Color), ByRef board(,) As Panel, ByRef piece As PiecesList, ByVal indexer As Byte)
+	'Private Sub ShowMoveSet(ByRef moveset As List(Of Panel), ByRef movesetcolor As List(Of Color), ByRef board(,) As Panel, ByRef piece As PiecesList, ByVal indexer As Byte)
+	Private Sub ShowMoveSet(ByRef movesetcolor As List(Of Color), ByRef board(,) As Panel, ByRef piece As PiecesList, ByVal indexer As Byte)
 		Dim adder As New List(Of Point)
 		Dim juice As Byte
+
+		piece.Items(indexer).LegalMoves.Clear()
 
 		Select Case piece.Items(indexer).Type
 			Case ChessPieces.Types.Pawn
@@ -362,14 +365,14 @@
 						If IfPresentGetPiece(piece, board(X, Y), juice) Then
 							If Juicer(piece, board(X, Y), indexer, juice) Then
 								If move.X <> 0 And ((move.Y > 0 And piece.Items(indexer).Color = ChessPieces.Colors.White) Or (move.Y < 0 And piece.Items(indexer).Color = ChessPieces.Colors.Black)) Then
-									moveset.Add(board(X, Y))
+									piece.Items(indexer).LegalMoves.Add(board(X, Y))
 								End If
 							End If
 						Else
 							If move.X = 0 And ((move.Y > 0 And piece.Items(indexer).Color = ChessPieces.Colors.White) Or (move.Y < 0 And piece.Items(indexer).Color = ChessPieces.Colors.Black)) Then
-								moveset.Add(board(X, Y))
+								piece.Items(indexer).LegalMoves.Add(board(X, Y))
 								If Math.Abs(move.Y) > 1 And piece.Items(indexer).First = False Then
-									moveset.Remove(board(X, Y))
+									piece.Items(indexer).LegalMoves.Remove(board(X, Y))
 								End If
 							End If
 						End If
@@ -383,10 +386,10 @@
 					If Y < ChessBoard.RW.rows And Y >= 0 And X >= 0 And X < ChessBoard.CL.columns Then
 						If IfPresentGetPiece(piece, board(X, Y), juice) Then
 							If Juicer(piece, board(X, Y), indexer, juice) Then
-								moveset.Add(board(X, Y))
+								piece.Items(indexer).LegalMoves.Add(board(X, Y))
 							End If
 						Else
-							moveset.Add(board(X, Y))
+							piece.Items(indexer).LegalMoves.Add(board(X, Y))
 						End If
 					End If
 				Next
@@ -398,10 +401,10 @@
 					If Y < ChessBoard.RW.rows And Y >= 0 And X >= 0 And X < ChessBoard.CL.columns Then
 						If IfPresentGetPiece(piece, board(X, Y), juice) Then
 							If Juicer(piece, board(X, Y), indexer, juice) Then
-								moveset.Add(board(X, Y))
+								piece.Items(indexer).LegalMoves.Add(board(X, Y))
 							End If
 						Else
-							moveset.Add(board(X, Y))
+							piece.Items(indexer).LegalMoves.Add(board(X, Y))
 						End If
 					End If
 				Next
@@ -422,7 +425,7 @@
 						If IfPresentGetPiece(piece, board(X, Y), juice) Then
 							If (X = piece.Items(indexer).Column Or Y = piece.Items(indexer).Row) And (X <= LockUp.X And Y <= LockUp.Y) And (X >= LockDown.X And Y >= LockDown.Y) Then
 								If Juicer(piece, board(piece.Items(indexer).Column + move.X, piece.Items(indexer).Row + move.Y), indexer, juice) Then
-									moveset.Add(board(piece.Items(indexer).Column + move.X, piece.Items(indexer).Row + move.Y))
+									piece.Items(indexer).LegalMoves.Add(board(piece.Items(indexer).Column + move.X, piece.Items(indexer).Row + move.Y))
 								End If
 							End If
 							If X = piece.Items(indexer).Column Then
@@ -441,7 +444,7 @@
 							End If
 						Else
 							If (X = piece.Items(indexer).Column Or Y = piece.Items(indexer).Row) And (X <= LockUp.X And Y <= LockUp.Y) And (X >= LockDown.X And Y >= LockDown.Y) Then
-								moveset.Add(board(X, Y))
+								piece.Items(indexer).LegalMoves.Add(board(X, Y))
 							End If
 						End If
 					End If
@@ -474,7 +477,7 @@
 								(X > piece.Items(indexer).Column And Y < piece.Items(indexer).Row) And (X <= LockDownRx.X And Y >= LockDownRx.Y) Or
 								(X < piece.Items(indexer).Column And Y < piece.Items(indexer).Row) And (X >= LockDownSx.X And Y >= LockDownSx.Y) Then
 								If Juicer(piece, board(piece.Items(indexer).Column + move.X, piece.Items(indexer).Row + move.Y), indexer, juice) Then
-									moveset.Add(board(piece.Items(indexer).Column + move.X, piece.Items(indexer).Row + move.Y))
+									piece.Items(indexer).LegalMoves.Add(board(piece.Items(indexer).Column + move.X, piece.Items(indexer).Row + move.Y))
 								End If
 							End If
 							' Limite ALTO-DX
@@ -502,7 +505,7 @@
 								(X < piece.Items(indexer).Column And Y > piece.Items(indexer).Row) And (X >= LockUpSx.X And Y <= LockUpSx.Y) Or
 								(X > piece.Items(indexer).Column And Y < piece.Items(indexer).Row) And (X <= LockDownRx.X And Y >= LockDownRx.Y) Or
 								(X < piece.Items(indexer).Column And Y < piece.Items(indexer).Row) And (X >= LockDownSx.X And Y >= LockDownSx.Y) Then
-								moveset.Add(board(X, Y))
+								piece.Items(indexer).LegalMoves.Add(board(X, Y))
 							End If
 						End If
 					End If
@@ -544,7 +547,7 @@
 								(X > piece.Items(indexer).Column And Y < piece.Items(indexer).Row) And (X <= LockDownRx.X And Y >= LockDownRx.Y) Or
 								(X < piece.Items(indexer).Column And Y < piece.Items(indexer).Row) And (X >= LockDownSx.X And Y >= LockDownSx.Y) Then
 								If Juicer(piece, board(piece.Items(indexer).Column + move.X, piece.Items(indexer).Row + move.Y), indexer, juice) Then
-									moveset.Add(board(piece.Items(indexer).Column + move.X, piece.Items(indexer).Row + move.Y))
+									piece.Items(indexer).LegalMoves.Add(board(piece.Items(indexer).Column + move.X, piece.Items(indexer).Row + move.Y))
 								End If
 							End If
 							' Limite VERTICALE
@@ -589,7 +592,7 @@
 								(X < piece.Items(indexer).Column And Y > piece.Items(indexer).Row) And (X >= LockUpSx.X And Y <= LockUpSx.Y) Or
 								(X > piece.Items(indexer).Column And Y < piece.Items(indexer).Row) And (X <= LockDownRx.X And Y >= LockDownRx.Y) Or
 								(X < piece.Items(indexer).Column And Y < piece.Items(indexer).Row) And (X >= LockDownSx.X And Y >= LockDownSx.Y) Then
-								moveset.Add(board(X, Y))
+								piece.Items(indexer).LegalMoves.Add(board(X, Y))
 							End If
 						End If
 					End If
@@ -597,7 +600,7 @@
 
 		End Select
 
-		For Each panel As Panel In moveset
+		For Each panel As Panel In piece.Items(indexer).LegalMoves
 			movesetcolor.Add(panel.BackColor)
 			panel.BackColor = Color.Turquoise
 		Next
@@ -620,7 +623,6 @@
 		Static CapturedIndex As Byte
 		Static StartPiecePosition As Panel = Nothing
 		Static StartBoardColor As Color
-		Static MoveSet As New List(Of Panel)
 		Static MoveSetColor As New List(Of Color)
 
 		If ClickOn = False Then
@@ -631,33 +633,39 @@
 				clicked.BackColor = Color.Teal
 				ClickOn = True
 				GetBoardCoordinates(pieces, board, MovingIndex)
-				ShowMoveSet(MoveSet, MoveSetColor, board, pieces, MovingIndex)
+				ShowMoveSet(MoveSetColor, board, pieces, MovingIndex)
 			End If
 		Else
 			' Second click: move a piece
-			CLearMoveSet(MoveSet, MoveSetColor)
-			ClickOn = False
 			StartPiecePosition.BackColor = StartBoardColor
 			If clicked IsNot StartPiecePosition Then
 				' Confirm move
-				If IfPresentGetPiece(pieces, clicked, CapturedIndex) Then
-					GetBoardCoordinates(pieces, board, CapturedIndex)
-					If pieces.Items(MovingIndex).Color = pieces.Items(CapturedIndex).Color Then
-						' Cannot auto-capture pieces
+				If IsMoveValid(board, pieces.Items(MovingIndex).LegalMoves, clicked) Then
+					If IfPresentGetPiece(pieces, clicked, CapturedIndex) Then
+						GetBoardCoordinates(pieces, board, CapturedIndex)
+						If pieces.Items(MovingIndex).Color = pieces.Items(CapturedIndex).Color Then
+							' Cannot auto-capture pieces
+						Else
+							' Capture a piece
+							CapturePiece(pieces, CapturedIndex)
+							MovePiece(pieces, clicked, MovingIndex)
+						End If
 					Else
-						' Capture a piece
-						CapturePiece(pieces, CapturedIndex)
 						MovePiece(pieces, clicked, MovingIndex)
 					End If
-				Else
-					MovePiece(pieces, clicked, MovingIndex)
 				End If
 			End If
+			ClickOn = False
+			CLearMoveSet(pieces.Items(MovingIndex).LegalMoves, MoveSetColor)
 		End If
 	End Sub
 
 
 	'--- V A P O R C H E S S F U N C | Private Board management functions --------------------------------------------------'
+	'-----------------------------------------------------------------------------------------------------------------------'
+	Private Function IsMoveValid(ByRef board(,) As Panel, ByRef moveset As List(Of Panel), ByVal clicked As Panel) As Boolean
+		Return moveset.Contains(clicked)
+	End Function
 	'-----------------------------------------------------------------------------------------------------------------------'
 	Private Function IfPresentGetPiece(ByRef origin As PiecesList, ByRef position As Panel, ByRef indexer As Byte) As Boolean
 		Dim i As Byte = 0

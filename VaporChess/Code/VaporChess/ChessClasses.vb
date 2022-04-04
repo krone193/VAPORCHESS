@@ -138,6 +138,7 @@ Public Class ChessPieces
 	Public Position As Panel
 	Public Column As UShort
 	Public Row As UShort
+	Public LegalMoves As New List(Of Panel)
 End Class
 
 
